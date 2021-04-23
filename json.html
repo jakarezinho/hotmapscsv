@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let feed = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSUDPek9-lEqX5eEUVK8TvnkoNL7y4GorNIERuJtkUxdRj8AswGR_ufMaHe1kMReUQCrBmK0ugi7_zy/pub?gid=467614608&single=true&output=csv'
+        let f = JSON.stringify(feed)
+
+        function convertCSVToJSON(str, delimiter = ',') {
+            const titles = str.slice(0, str.indexOf('\n')).split(delimiter);
+            const rows = str.slice(str.indexOf('\n') + 1).split('\n');
+            return rows.map(row => {
+                const values = row.split(delimiter);
+                return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
+            });
+        };
+
+        let data;
+
+        data = 'id, name, email\n0, Todd, todd@gmail.com\n1, Petra, petra@gmail.com';
+        console.log(convertCSVToJSON(f, ','))
+    </script>
+</body>
+
+</html>

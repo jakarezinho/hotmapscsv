@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
+    <style>
+         :root {
+            --blanc: #FFF;
+            --noir: #000;
+            --shadow: #2e2d2d;
+            --shadow_map: text-shadow: 1px 1px 0 var(--shadow), 1px 2px 0 var(--shadow), 3px 3px 0 var(--shadow), -1px -1px 0 var(--shadow), 1px -1px 0 var(--shadow), -1px 1px 0 var(--shadow), 0 1px 0 var(--shadow);
+        }
+        
+        html,
+        body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            font-family: 'Nunito', sans-serif;
+            font-size: 100%;
+        }
+        
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: 0;
+        }
+        
+        .leaflet-tooltip.my-labels {
+            background-color: transparent;
+            box-shadow: none;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 1px 1px 0 var(--shadow), 1px 2px 0 var(--shadow), 3px 3px 0 var(--shadow), -1px -1px 0 var(--shadow), 1px -1px 0 var(--shadow), -1px 1px 0 var(--shadow), 0 1px 0 var(--shadow);
+            white-space: normal;
+            text-align: center;
+            line-height: 120%;
+            border: none;
+            width: 200px;
+            border-width: 2px;
+            color: var(--blanc);
+        }
+        
+        .leaflet-tooltip.my-labels p {
+            padding: 0;
+            margin: 0;
+        }
+        /* ////// NAVIGATION /////  */
+        
+        .leaflet-popup-content-wrapper {
+            border-radius: 5px !important;
+        }
+        
+        .menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+        
+        .menu span {
+            width: 35px;
+            height: 35px;
+            padding: 5px;
+            border-radius: 50%;
+            font-size: 35px;
+            background-color: var(--blanc);
+            cursor: pointer;
+        }
+        
+        .doc {
+            background-color: #c2b8ab;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            position: fixed;
+            /* left: 100vw;*/
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 300ms;
+            z-index: 0;
+        }
+        
+        .dep {
+            /*transform: translateX(-100vw);*/
+            opacity: 1;
+            z-index: 1000;
+        }
+        
+        .header {
+            color: var(--blanc);
+            text-shadow: 2px 2px var(--shadow);
+            margin: 20px;
+            padding-top: 100px;
+            font-size: 30px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+</head>
+
+<body>
+    <div class="menu">
+        <div id="open"></div>
+    </div>
+    <div id="dc" class="doc">
+        <div class="header">
+            <p><img src="images/hot_map.gif"></p>
+            <h1> Para saber melhor</h1>
+            <p>sasasasa</p>
+        </div>
+
+    </div>
+    <div id="map"></div>
+
+</body>
+<script>
+    /////MENU  OPEN///
+
+    let open = document.querySelector('#open')
+    let dcm = document.querySelector('#dc')
+    open.innerHTML = '<span class="material-icons-two-tone">help_outline </span>'
+
+
+    open.addEventListener("click", () => {
+            open.innerHTML = '<span class="material-icons-two-tone">close</span>'
+            if (dcm.classList.contains('dep')) {
+                open.innerHTML = '<span class="material-icons-two-tone">help_outline</span>'
+
+            } else {
+                open.innerHTML = '<span class="material-icons-two-tone">close</span>'
+
+            }
+
+            dc.classList.toggle("dep")
+
+        })
+        /////DEVICE/////
+    let zoomDevice
+    let device
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // true for mobile device
+        zoomDevice = 13
+        device == 'mobile'
+    } else {
+        // false for not mobile device
+        zoomDevice = 15
+        device == 'destop'
+    }
+
+    ////MAP////
+    let map = L.map('map', {
+        zoomControl: false
+    }).setView([39.40748359101977, -9.131741523742676], zoomDevice)
+
+
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        minZoom: 11,
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoibWFwYXVyYmFubyIsImEiOiJja215cm8xYzIwNHp1Mnh0M2QwZ3puZmkwIn0.ig4jIr-gZzUfuIX8YZB0ug'
+    }).addTo(map);
+    ///zoom control
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
+
+    ///// GEOJSON URL/////////////////////////////
+    const url = "geo.json"
+        //const detail = "data/detail.geojson"
+        ////////////////////////////////////////////
+
+
+
+    ////// POPUP/////
+    function onEachFeature(feature, layer) {
+        let info = feature.properties.info ? feature.properties.info : ''
+        let adress = feature.properties.adress ? feature.properties.adress : ''
+        let popupContent = "<h3>HERE / AQUI </h3>"
+
+
+
+        if (feature.properties && feature.properties.title) {
+            popupContent += '<strong>' + feature.properties.title + '</strong><br>'
+            popupContent += 'Infos: ' + info + '<br> Adress: ' + feature.properties.adress
+
+        }
+
+        layer.bindPopup(popupContent);
+    }
+
+    //// function text marker zoom////
+    function textZoom(pointLayer, zoom) {
+        let zoomlevel = map.getZoom();
+
+        if (zoomlevel < zoom) {
+            if (map.hasLayer(pointLayer)) {
+                map.removeLayer(pointLayer);
+
+            } else {
+                console.log("no point layer active");
+            }
+        }
+        if (zoomlevel >= zoom) {
+            if (map.hasLayer(pointLayer)) {
+                console.log("layer already added");
+            } else {
+                map.addLayer(pointLayer);
+
+            }
+        }
+        console.log("Current Zoom Level =" + zoomlevel)
+
+    };
+
+
+    ////////LABEL IMAGE TEXTE ////////
+    function labelText(feature, latlng) {
+        let color = feature.properties.color ? feature.properties.color : '#897459'
+        let name = feature.properties.title ? feature.properties.title : ''
+        let size = feature.properties.size ? feature.properties.size : '20'
+        let radius = size ? size * 2.3 : 100
+        let post_date = feature.properties.time ? feature.properties.time : ''
+        let novo = novidade(post_date)
+
+
+        let l = imogIcon(feature.properties.icon)
+
+        label = String(novo + l + '<span " style=" font-size: ' + size + 'px;">' + name + '</span>') // .bindTooltip can't use straight 'feature.properties.attribute'
+        return new L.CircleMarker(latlng, {
+            radius: radius,
+            fillColor: color
+        }).bindTooltip(label, {
+            permanent: true,
+            direction: "center",
+            className: "my-labels"
+        }).openTooltip();
+
+    }
+
+
+    //// TEXT MARKER ZOOM ////
+    function textZoomDetail(pointLayer, zoom) {
+        let zoomlevel = map.getZoom();
+        map.addLayer(pointLayer)
+        if (zoomlevel < zoom) {
+            if (map.hasLayer(pointLayer)) {
+                map.removeLayer(pointLayer);
+            } else {
+                console.log("no point layer active");
+            }
+        }
+        if (zoomlevel >= zoom) {
+            if (map.hasLayer(pointLayer)) {
+                console.log("layer already added");
+            } else {
+                map.addLayer(pointLayer);
+            }
+        }
+        console.log("Current Zoom Level =" + zoomlevel)
+
+    };
+
+    ///////////  GET URL FUNCTION GENERALE /////////////////////
+    function getText(url, detail = false, zoom = false) {
+
+        //// fecth general level 1/////
+        fetch(url)
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data.features)
+
+
+                let geral = L.geoJSON(data, {
+
+                    style: (feature) => {
+                        return {
+                            color: feature.properties.Color,
+                            opacity: 0,
+                            //dashArray: 20,
+                            // fill: false
+                        };
+                    },
+
+                    onEachFeature: onEachFeature,
+
+                    pointToLayer: labelText
+
+                });
+                geral.addData(data)
+                map.addLayer(geral)
+                    /////ADD E REMOVE LAYER EN DECSKTOP///
+                    // map.on('zoomend', () => layerGeneral(geral, zoom))
+                    // map.fitBounds(pointLayer.getBounds());
+
+            });
+
+        ///// fetch detail caldas da rainha////
+        if (detail) {
+
+            fetch(detail)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(data.features)
+
+
+                    let detail = L.geoJSON(data, {
+
+                        style: (feature) => {
+                            return {
+                                color: feature.properties.Color,
+                                opacity: 0,
+                                //dashArray: 20,
+                                // fill: false
+                            };
+                        },
+
+                        onEachFeature: onEachFeature,
+
+                        pointToLayer: labelText
+
+                    });
+
+
+
+
+                    /////add remove layer zoom///
+
+                    map.on('zoomend', () => textZoom(detail, zoom))
+                        // map.fitBounds(pointLayer.getBounds());
+                });
+
+        }
+
+
+
+
+
+    } //////// FIM
+
+
+
+
+    ///// ADD REMOVE LAYER PRINCIPAL ZOOM LEVEL ////
+
+    function layerGeneral(layer, zoom) {
+        let zoommap = map.getZoom();
+        if (zoommap >= zoom) {
+            if (map.hasLayer(layer)) {
+                map.removeLayer(layer);
+                console.log("layer active non active geral");
+            }
+
+        } else {
+            map.addLayer(layer)
+            console.log("layer active geral active");
+        }
+
+
+    }
+
+    ///// IMAGE ICON ///////
+    function imogIcon(icon) {
+
+        if (icon) {
+            return '<p><img src="images/' + icon + '.gif"></p>';
+        } else {
+            return ''
+        }
+    }
+
+    ////////////////// FUNCTION NOVIDADE /////////////////////
+    function novidade(post_date) {
+        var countDownDate = new Date(post_date).getTime()
+        var now = new Date().getTime();
+
+        // Find the distance between now an the count down date
+        var distance = now - countDownDate
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        console.log(days)
+        return days <= 5 ? "<img src='images/novo.gif'>" : ""
+    }
+
+    /////// FIM
+
+    window.load = getText(url, null, 15)
+</script>
+
+
+</html>

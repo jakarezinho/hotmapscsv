@@ -1,0 +1,157 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "hot",
+                "size": "30",
+                "time": "Thu Apr 22 2021 17:12:43 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "Turistas e hipsters",
+                "color": "",
+                "adress": "Cl. Ginobst\u00e9trica Dr. Daniel \u00c1lvaro"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.133543968200685",
+                    "39.40396869411111"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "14",
+                "time": "Thu Apr 22 2021 17:27:57 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "nature",
+                "color": "#ea901a",
+                "adress": "Rua Rafael Bordalo Pinheiro"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.130132198333742",
+                    "39.40147334138002"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "15",
+                "time": "Thu Apr 22 2021 17:29:11 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "God area",
+                "color": "#ea901a",
+                "adress": "Rua de Cam\u00f5es"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.1341769695282",
+                    "39.4023521136554"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "15",
+                "time": "Thu Apr 22 2021 18:03:10 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "Pr\u00e9dios",
+                "color": "#db871a",
+                "adress": "Rua Adelino Soares de Oliveira 20"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.139144420623781",
+                    "39.4075664873934"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "14",
+                "time": "Thu Apr 22 2021 18:08:50 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "estudantes artistas",
+                "color": "#897459",
+                "adress": "Rua Isidoro In\u00e1cio Alves de Carvalho"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.134488105773928",
+                    "39.39551232020589"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "mercado",
+                "size": "20",
+                "time": "Thu Apr 22 2021 19:08:30 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "A minha feira",
+                "color": "#ee7c3f",
+                "adress": "Rua Insepar\u00e1veis de Lubango"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.12243962287903",
+                    "39.40754990812657"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "18",
+                "time": "Thu Apr 22 2021 19:18:57 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "Talho",
+                "color": "#897459",
+                "adress": "Pra\u00e7a de Touros de Caldas da Rainha"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.135088920593263",
+                    "39.40735095661698"
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "icon": "",
+                "size": "18",
+                "time": "Thu Apr 22 2021 19:39:55 GMT+0100 (Hora de ver\u00e3o da Europa Ocidental)",
+                "info": "",
+                "title": "O meu caf\u00e9",
+                "color": "#897459",
+                "adress": "Rua Alberto Nunes Miguel 8-38"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    "-9.120154380798342",
+                    "39.40637277010564"
+                ]
+            }
+        }
+    ]
+}

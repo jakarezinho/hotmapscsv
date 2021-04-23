@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Reverse geocoding from map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js" integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ==" crossorigin=""></script>
+
+    <!-- Load Esri Leaflet Geocoder from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css" integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g==" crossorigin="">
+    <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js" integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA==" crossorigin=""></script>
+
+    <!--imojis 
+    <link rel="stylesheet" href="	https://cdnjs.cloudflare.com/ajax/libs/emojionearea/3.4.2/emojionearea.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/emojionearea@3.4.2/dist/emojionearea.js"></script>
+-->
+
+    <style>
+         :root {
+            --blanc: #FFF;
+            --noir: #000;
+            --shadow: #2e2d2d;
+            --shadow_map: text-shadow: 1px 1px 0 var(--shadow), 1px 2px 0 var(--shadow), 3px 3px 0 var(--shadow), -1px -1px 0 var(--shadow), 1px -1px 0 var(--shadow), -1px 1px 0 var(--shadow), 0 1px 0 var(--shadow);
+        }
+        
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+        
+        #tag {
+            padding: 8px;
+            background-color: var(--blanc);
+            position: absolute;
+            z-index: 900;
+            display: none;
+            box-shadow: 1px 1px 1px rgb(0 0 0 / 75%);
+            border-radius: 10px;
+            margin-left: -.5em;
+            margin-top: -.5em;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            font-weight: 400;
+        }
+        
+        .content {
+            position: absolute;
+            z-index: 900;
+            left: 20;
+            top: 20px;
+        }
+        
+        .enable {
+            position: absolute;
+            z-index: 900;
+            right: 20px;
+            top: 20px;
+        }
+        
+        .active {
+            background-color: brown;
+            display: block;
+        }
+        /* ////// STYLE VISTA /////// */
+        
+        .leaflet-tooltip.my-labels {
+            background-color: transparent;
+            box-shadow: none;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 1px 1px 0 var(--shadow), 1px 2px 0 var(--shadow), 3px 3px 0 var(--shadow), -1px -1px 0 var(--shadow), 1px -1px 0 var(--shadow), -1px 1px 0 var(--shadow), 0 1px 0 var(--shadow);
+            white-space: normal;
+            text-align: center;
+            line-height: 120%;
+            border: none;
+            width: 200px;
+            border-width: 2px;
+            color: var(--blanc);
+        }
+        
+        .leaflet-tooltip.my-labels p {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="escreve" class="enable"> escreve</button>
+    <input type="text" id="tag" placeholder="tag" />
+    <div class="content">
+        <input type="text" id="lat" placeholder="latitude" />
+        <input type="text" id="lng" placeholder="longitude" />
+        <input type="text" id="adress" placeholder="morada" />
+        <input type="text" id="icon" placeholder="icon" />
+        <input type="color" id="color" placeholder="color" value='#897459' />
+        <input type="text" id="info" placeholder="info" />
+        <input type="number" id="size" min="12" max="40" step="1" value="18">
+        <input type="text" id="time" placeholder="time" />
+    </div>
+
+
+
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map').setView([39.40761622517027, -9.13393020629883], 15);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            minZoom: 11,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoibWFwYXVyYmFubyIsImEiOiJja215cm8xYzIwNHp1Mnh0M2QwZ3puZmkwIn0.ig4jIr-gZzUfuIX8YZB0ug'
+        }).addTo(map);
+        ///zoom control
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        L.esri.Geocoding.suggest()
+            .text('caldas')
+            .nearby([39.40761622517027, -9.13393020629883], 5000)
+            .run(function(error, response) {
+                console.log(response)
+                    /* response syntax is documented here:
+                    https://developers.arcgis.com/rest/geocode/api-reference/geocoding-suggest.htm#ESRI_SECTION1_FC3884A45AD24E62BD11C9888F1392DB
+                    */
+            });
+
+        var gcs = L.esri.Geocoding.geocodeService();
+
+        let tag = document.getElementById('tag')
+        let lat = document.getElementById('lat')
+        let lng = document.getElementById('lng')
+        let escreve = document.getElementById('escreve')
+        let adress = document.getElementById('adress')
+        let icon = document.getElementById('icon')
+        let color = document.getElementById('color')
+        let info = document.getElementById('info')
+
+
+
+
+        escreve.addEventListener('click', () => {
+            escreve.classList.toggle("active")
+            let active = escreve.classList.contains('active')
+            tag.style.display = 'none'
+            map.on('click', (e) => {
+                if (active) {
+                    console.log(' active')
+                    gcs.reverse().latlng(e.latlng).run((err, res) => {
+                        if (err) return;
+                        adress.value = res.address.ShortLabel
+
+                    })
+
+                    console.log(tag)
+                    lat.value = e.latlng.lat
+                    lng.value = e.latlng.lng
+                    tag.style.left = e.containerPoint.x + 'px'
+                    tag.style.top = e.containerPoint.y + 'px'
+                    tag.style.display = 'block'
+                    tag.focus()
+
+                } else {
+
+                    console.log('non active')
+                    escreve.classList.remove("active")
+
+                    tag.style.display = 'none'
+
+                }
+
+            })
+            map.on('mousedown', (e) => {
+
+                tag.style.display = 'none'
+            })
+
+            tag.addEventListener("keyup", ({
+                key
+            }) => {
+                if (key === "Enter") {
+                    if (tag.value === '') {
+                        alert('Tag vazio!')
+                        return
+
+                    }
+                    // fetchpost()
+
+                    console.log(tag.value)
+                    tag.value = ''
+                    icon.value = ''
+                    size.value = '14'
+                    info.value = ''
+                    color.value = '#897459'
+                    tag.style.display = 'none'
+
+
+                }
+            })
+
+        })
+
+        function fetchpost() {
+            // (A) GET FORM DATA
+            let data = new URLSearchParams();
+            data.append("texte", tag.value);
+            data.append("latitude", lat.value);
+            data.append("longitude", lng.value);
+            data.append("morada", adress.value);
+            data.append("size", size.value);
+            data.append("icon", icon.value);
+            data.append("color", color.value);
+            data.append("info", info.value);
+            data.append("time", new Date());
+
+
+            // (B) FETCH
+            fetch("https://hook.integromat.com/hfx4pihvit5rkl2liv4qkumaehet5rnm", {
+                    method: 'post',
+                    body: data
+                })
+                .then(function(response) {
+                    return response.text();
+                })
+                .then(function(text) {
+                    console.log(text);
+
+                })
+                .catch(function(error) {
+                    console.log(error)
+                });
+
+            // (C) PREVENT HTML FORM SUBMIT
+            return false;
+        }
+
+        //////////////////////// VUE////////////////////////
+        //// GEOJSON URL/////////////////////////////
+        const url = "geo.json"
+            //const detail = "data/detail.geojson"
+            ////////////////////////////////////////////
+
+
+
+        ////// POPUP/////
+        function onEachFeature(feature, layer) {
+            let info = feature.properties.info ? feature.properties.info : ''
+            let adress = feature.properties.adress ? feature.properties.adress : ''
+            let popupContent = "<h3>HERE / AQUI </h3>"
+
+
+
+            if (feature.properties && feature.properties.title) {
+                popupContent += '<strong>' + feature.properties.title + '</strong><br>'
+                popupContent += 'Infos: ' + info + '<br> Adress: ' + feature.properties.adress
+
+            }
+
+            layer.bindPopup(popupContent);
+        }
+
+        //// function text marker zoom////
+        function textZoom(pointLayer, zoom) {
+            let zoomlevel = map.getZoom();
+
+            if (zoomlevel < zoom) {
+                if (map.hasLayer(pointLayer)) {
+                    map.removeLayer(pointLayer);
+
+                } else {
+                    console.log("no point layer active");
+                }
+            }
+            if (zoomlevel >= zoom) {
+                if (map.hasLayer(pointLayer)) {
+                    console.log("layer already added");
+                } else {
+                    map.addLayer(pointLayer);
+
+                }
+            }
+            console.log("Current Zoom Level =" + zoomlevel)
+
+        };
+
+
+        ////////LABEL IMAGE TEXTE ////////
+        function labelText(feature, latlng) {
+            let color = feature.properties.color ? feature.properties.color : '#897459'
+            let name = feature.properties.title ? feature.properties.title : ''
+            let size = feature.properties.size ? feature.properties.size : '20'
+            let radius = size ? size * 2.3 : 100
+            let post_date = feature.properties.time ? feature.properties.time : ''
+            let novo = novidade(post_date)
+
+
+            let l = imogIcon(feature.properties.icon)
+
+            label = String(novo + l + '<span " style=" font-size: ' + size + 'px;">' + name + '</span>') // .bindTooltip can't use straight 'feature.properties.attribute'
+            return new L.CircleMarker(latlng, {
+                radius: radius,
+                fillColor: color
+            }).bindTooltip(label, {
+                permanent: true,
+                direction: "center",
+                className: "my-labels"
+            }).openTooltip();
+
+        }
+
+
+        //// TEXT MARKER ZOOM ////
+        function textZoomDetail(pointLayer, zoom) {
+            let zoomlevel = map.getZoom();
+            map.addLayer(pointLayer)
+            if (zoomlevel < zoom) {
+                if (map.hasLayer(pointLayer)) {
+                    map.removeLayer(pointLayer);
+                } else {
+                    console.log("no point layer active");
+                }
+            }
+            if (zoomlevel >= zoom) {
+                if (map.hasLayer(pointLayer)) {
+                    console.log("layer already added");
+                } else {
+                    map.addLayer(pointLayer);
+                }
+            }
+            console.log("Current Zoom Level =" + zoomlevel)
+
+        };
+
+        ///////////  GET URL FUNCTION GENERALE /////////////////////
+        function getText(url, detail = false, zoom = false) {
+
+            //// fecth general level 1/////
+            fetch(url)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(data.features)
+
+
+                    let geral = L.geoJSON(data, {
+
+                        style: (feature) => {
+                            return {
+                                color: feature.properties.Color,
+                                opacity: 0,
+                                //dashArray: 20,
+                                // fill: false
+                            };
+                        },
+
+                        onEachFeature: onEachFeature,
+
+                        pointToLayer: labelText
+
+                    });
+                    geral.addData(data)
+                    map.addLayer(geral)
+                        /////ADD E REMOVE LAYER EN DECSKTOP///
+                        // map.on('zoomend', () => layerGeneral(geral, zoom))
+                        // map.fitBounds(pointLayer.getBounds());
+
+                });
+
+            ///// fetch detail caldas da rainha////
+            if (detail) {
+
+                fetch(detail)
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log(data.features)
+
+
+                        let detail = L.geoJSON(data, {
+
+                            style: (feature) => {
+                                return {
+                                    color: feature.properties.Color,
+                                    opacity: 0,
+                                    //dashArray: 20,
+                                    // fill: false
+                                };
+                            },
+
+                            onEachFeature: onEachFeature,
+
+                            pointToLayer: labelText
+
+                        });
+
+
+
+
+                        /////add remove layer zoom///
+
+                        map.on('zoomend', () => textZoom(detail, zoom))
+                            // map.fitBounds(pointLayer.getBounds());
+                    });
+
+            }
+
+
+
+
+
+        } //////// FIM
+
+
+
+
+        ///// ADD REMOVE LAYER PRINCIPAL ZOOM LEVEL ////
+
+        function layerGeneral(layer, zoom) {
+            let zoommap = map.getZoom();
+            if (zoommap >= zoom) {
+                if (map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                    console.log("layer active non active geral");
+                }
+
+            } else {
+                map.addLayer(layer)
+                console.log("layer active geral active");
+            }
+
+
+        }
+
+        ///// IMAGE ICON ///////
+        function imogIcon(icon) {
+
+            if (icon) {
+                return '<p><img src="images/' + icon + '.gif"></p>';
+            } else {
+                return ''
+            }
+        }
+
+        ////////////////// FUNCTION NOVIDADE /////////////////////
+        function novidade(post_date) {
+            var countDownDate = new Date(post_date).getTime()
+            var now = new Date().getTime();
+
+            // Find the distance between now an the count down date
+            var distance = now - countDownDate
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            console.log(days)
+            return days <= 5 ? "<img src='images/novo.gif'>" : ""
+        }
+
+        /////// FIM
+
+        window.load = getText(url, null, 15)
+    </script>
+
+
+</body>
+
+</html>
